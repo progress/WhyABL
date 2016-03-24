@@ -26,7 +26,7 @@ FIND FIRST ttitem WHERE ttitem.itemnum = 14.
    items where we have stock less than 10000 */
 FOR EACH ttitem WHERE ttitem.onhand > 10000 
     BY ttitem.weight DESCENDING:
-//    DISPLAY ttitem. 
+    DISPLAY ttitem. 
 END.
 
 /* Find a subset of items that have been ordered more than 100 times
