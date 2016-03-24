@@ -22,7 +22,7 @@ END.
 /* Navigate to a specific index */
 FIND FIRST ttitem WHERE ttitem.itemnum = 14.
 
-/* Sort from heighest weight to lowest and filter out 
+/* Sort from highest weight to lowest and filter out 
    items where we have stock less than 10000 */
 FOR EACH ttitem WHERE ttitem.onhand > 10000 
     BY ttitem.weight DESCENDING:
@@ -34,7 +34,7 @@ END.
 FOR EACH ttorderline WHERE ttorderline.qty >= 100,
     EACH ttitem WHERE ttorderline.itemnum = ttitem.itemnum:
     DISPLAY ttitem.itemname ttitem.itemnum ttorderline.qty.
-END.
+END.h
 
 /* Find the number of orders each item had and sort by
    ttitem.name. */ 
