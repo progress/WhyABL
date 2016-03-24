@@ -34,19 +34,19 @@ public class java_example {
 	    conn.setAutoCommit(false);
 
 	    // Execute a query
-	    String update = 
-		"UPDATE customers " +
-		"SET BALANCE = BALANCE + 0.05 " +
-		"WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
-	    
-	    preparedStmt = conn.prepareStatement(update);
-	    	    
-	    // Replace the format specifier with a value
-	    preparedStmt.setInt(1, i);
-	
-	    preparedStmt.executeUpdate();
-	    conn.commit();
-	    System.out.println("Executed update");
+	        String update = 
+		    "UPDATE customers " +
+		    "SET BALANCE = BALANCE + 0.05 " +
+		    "WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
+		    
+		preparedStmt = conn.prepareStatement(update);
+		    
+		// Replace the format specifier with a value
+		preparedStmt.setInt(1, i);
+		
+		preparedStmt.executeUpdate();
+		conn.commit();
+		System.out.println("Executed update");
 	} 
 	// Handle exceptions
 	catch(Exception e){
@@ -56,7 +56,7 @@ public class java_example {
 	    } catch (SQLException excep) {
 		System.out.println("Rollback failed.");
 		excep.printStackTrace();
-	    } 	    
+	    }     
 	} 
 	// Close resources
 	finally {
