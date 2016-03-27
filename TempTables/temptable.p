@@ -19,8 +19,10 @@ FOR EACH orderline:
     RELEASE ttorderline.
 END.
 
-/* Navigate to a specific index */
-FIND FIRST ttitem WHERE ttitem.itemnum = 14.
+/* Navigate through the records */
+FIND FIRST ttitem WHERE ttitem.minqty >= 5.
+FIND LAST ttorderline WHERE ttorderline.itemnum = 14.
+FIND PREV ttorderline WHERE ttorderline.itemnum = 14.
 
 /* Sort from highest weight to lowest and filter out 
    items where we have stock less than 10000 */
@@ -34,15 +36,17 @@ END.
 FOR EACH ttorderline WHERE ttorderline.qty >= 100,
     EACH ttitem WHERE ttorderline.itemnum = ttitem.itemnum:
     DISPLAY ttitem.itemname ttitem.itemnum ttorderline.qty.
-END.h
+END.
 
-/* Find the number of orders each item had and sort by
-   ttitem.name. */ 
+/* Find the number of orders for each item and the total amount it ever
+   sold. Then, display these alphabetically by ttitem.name. */ 
 FOR EACH ttitem BY ttitem.itemname:
     FOR EACH ttorderline WHERE ttorderline.itemnum = ttitem.itemnum:
-         ACCUMULATE ttorderline.ordernum (COUNT).
+        ACCUMULATE ttorderline.ordernum (COUNT).
+        ACCUMULATE ttorderline.qty (TOTAL).
     END.
-    DISPLAY ttitem.itemname (ACCUM COUNT ttorderline.ordernum).
+    DISPLAY ttitem.itemname (ACCUM COUNT ttorderline.ordernum) 
+        (ACCUM TOTAL ttorderline.qty).
 END.
 
 

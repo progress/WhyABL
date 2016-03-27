@@ -34,10 +34,10 @@ public class java_example {
 	    conn.setAutoCommit(false);
 
 	    // Execute a query
-	        String update = 
-		    "UPDATE customers " +
-		    "SET BALANCE = BALANCE + 0.05 " +
-		    "WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
+        String update =
+        "UPDATE customers " +
+        "SET BALANCE = BALANCE + 0.05 " +
+        "WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
 		    
 		preparedStmt = conn.prepareStatement(update);
 		    
