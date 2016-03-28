@@ -1,10 +1,15 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
    File Name: TempTable/result_set.java
-   Version: 0.1
+   Version: 1.0
 
-   This file shows the usage of result sets in Java.7
+   This example aims to show the added difficulty of navigating,
+   sorting, and filtering through result sets from queries. 
 
+   A lot of the logic was deliberately not done in the query as 
+   the aim is to present the usage of result sets. We only do two
+   database queries in this example, one from the orderdetails
+   table and one from the products table.
 */
 
 import java.sql.*;
@@ -21,16 +26,15 @@ public class result_set {
    
     public static void main(String[] args) {
 	Connection conn = null;
-	PreparedStatement preparedStmt = null;
-	Statement stmt = null;
-	ResultSet rs = null;
+	Statement stmt1 = null;
+	Statement stmt2 = null;
+	ResultSet products = null;
+	ResultSet orderdetails = null;
+	String sql; 
 
 	// An array list of an array list of strings is how we're going to
 	// have to represent a table.
 	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>(); 
-
-	// preparedStmt = conn.prepareStatement(update);	    	    
-	// preparedStmt.executeUpdate();
 
 	try {
 	    // Register JDBC driver
@@ -39,46 +43,93 @@ public class result_set {
 	    // Open a connection
 	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
 
-	    stmt = conn.createStatement();
+	    stmt1 = conn.createStatement();
+	    stmt2 = conn.createStatement();
 
-	    // Execute a query
-	    String sql = "SELECT * FROM products";
-	    
-	    rs = stmt.executeQuery(sql);
+	    // Store the tables products and orderdetails locally
+	    sql = "SELECT * FROM products";
+	    products = stmt1.executeQuery(sql);
 
-	    // Navigate to a row that fulfills a certain condition
-	    while (rs.next()) {
-		// Grab the product code. This requires you to know
-		// the schema beforehand.
-		String s = rs.getString("productCode");
-		
-		if (s.equals("S10_1949")) {
-		    System.out.println("Product Code: " + rs.getString("productCode") + "\n" +
-				       "Product Name: " + rs.getString("productName") + "\n");
+	    sql = "SELECT * FROM orderdetails";
+	    orderdetails = stmt2.executeQuery(sql);
+
+	    // This section is analagous to the ABL code:
+	    // FIND FIRST product where productVendor = Classic Metal Creations.
+	    products.beforeFirst();
+
+	    while (products.next()) {
+		// When extracting column values, the user has to check the schema 
+		// to make sure that the variables to contain these values have
+		// matching types.
+		String productVendor = products.getString("productVendor");
+		String productName = products.getString("productName");
+
+		if (productVendor.equals("Classic Metal Creations")) {
+		    System.out.println("Product Vendor: " + productVendor + "\n" +
+				       "Product Name: " + productName + "\n");
+		    break;
 		}
 	    }
 	   
- 	    // Rewind result set
-	    rs.beforeFirst(); 
+	    // This section is analagous to the ABL code:
+	    // FIND LAST orderdetails where productCode = 'S18_3232'.    
+	    
+	    // Go to the last entry
+	    orderdetails.afterLast();
 
-	    // Sort from highest MSRP to lowest and filter out 
-	    // items where we have stock less than 5000 
+	    while (orderdetails.previous()) {
+		String productCode = orderdetails.getString("productCode");
+		int orderNumber = orderdetails.getInt("orderNumber");
+
+		if (productCode.equals("S18_3232")) {
+		    System.out.println("Order Number: " + orderNumber + "\n" +
+				       "Product Code: " + productCode + "\n" );
+		    break;
+		}
+	    }
+
+	    // This section is analagous to the ABL code:
+	    // FIND PREV orderdetails where productCode = 'S18_3232'
+	    while (orderdetails.previous()) {
+		String productCode = orderdetails.getString("productCode");
+		int orderNumber = orderdetails.getInt("orderNumber");
+
+		if (productCode.equals("S18_3232")) {
+		    System.out.println("Order Number: " + orderNumber + "\n" +
+				       "Product Code: " + productCode + "\n" );
+		    break;
+		}
+	    }
+
+	    // This section (and the class MSRPCompare) is analagous to the
+	    // ABL code:
+	    // FOR EACH products WHERE products.quantityInStock > 5000 
+	    //    BY products.MSRP DESCENDING:
+	    //    DISPLAY products. 
+	    // END.
+
+	    // Easiest way to sort in Java is by using Collections, so we'll 
+	    // have to convert our result set into an ArrayList.
+
+	    // Reset our tables
+	    products.beforeFirst();
+	    orderdetails.beforeFirst();
 
 	    // Iterate through the result set, filtering out 
 	    // the unwanted ones. 
-	    while (rs.next()) {
-		if (rs.getDouble("quantityInStock") > 5000) {
+	    while (products.next()) {
+		if (products.getInt("quantityInStock") > 5000) {
 		    // This ArrayList represents a row
 		    ArrayList<String> row = new ArrayList<String>();
 
 		    // Add each column to our ArrayList
-		    row.add(rs.getString("productCode"));
-		    row.add(rs.getString("productName"));
-		    row.add(rs.getString("productLine"));
-		    row.add(rs.getString("productScale"));
-		    row.add(rs.getString("productVendor"));
-		    row.add(rs.getString("productDescription"));
-		    row.add(Double.toString(rs.getDouble("MSRP")));
+		    row.add(products.getString("productCode"));
+		    row.add(products.getString("productName"));
+		    row.add(products.getString("productLine"));
+		    row.add(products.getString("productScale"));
+		    row.add(products.getString("productVendor"));
+		    row.add(products.getString("productDescription"));
+		    row.add(Double.toString(products.getDouble("MSRP")));
 
 		    // Add our makeshift row to our makeshift table
 		    table.add(row);
@@ -87,17 +138,75 @@ public class result_set {
 
 	    // Sort our table by item MSRP
 	    Collections.sort(table, new MSRPCompare()) ;
-		
+	      
 	    // Print out our sorted result set.
 	    for (ArrayList<String> row : table) {	       
 		System.out.println("Product Name: " + row.get(1) + "\n" +
 				   "MSRP: " + row.get(6) + "\n");
 	    }
 
-	    // Rewind result set and clear our table implementation
-	    rs.beforeFirst(); 
-	    table.clear();
-	    
+ 	    // This section is analogous to the ABL code:
+	    // FOR EACH orderdetails WHERE orderdetails.quantity >= 100,
+	    //     EACH products WHERE products.productCode = orderdetails.productCode:
+	    //     DISPLAY products.productName products.productCode orderdetails.quantityOrdered.
+	    // END.
+
+	    // Reset our tables. 
+	    products.beforeFirst();
+	    orderdetails.beforeFirst();
+
+	    while (products.next()) {
+		String productCode = products.getString("productCode"); 
+		String productName = products.getString("productName"); 
+
+		while (orderdetails.next()) {
+		    String orderProductCode = orderdetails.getString("productCode");
+		    int quantityOrdered = orderdetails.getInt("quantityOrdered");
+		    
+		    if (productCode.equals(orderProductCode) && 
+			quantityOrdered >= 50) {
+			System.out.println("Product Code: " + productCode + "\n" +
+					   "Product Name: " + productName + "\n" +
+					   "Quantity Ordered: " + quantityOrdered + "\n");
+		    }
+		}
+	    }    
+
+	    // This section is analagous to the ABL code:
+	    // FOR EACH products:
+	    //     FOR EACH orderdetails WHERE orderdetails.productCode = products.productCode:
+	    //         ACCUMULATE orderdetails.orderNumber (COUNT).
+	    //         ACCUMULATE orderdetails.quantityOrdered (TOTAL).
+	    //     END.
+	    //     DISPLAY products.productName (ACCUM COUNT orderdetails.orderNumber) 
+	    //         (ACCUM TOTAL orderdetails.quantityOrdered).
+	    // END.
+
+	    // Reset our tables. 
+	    products.beforeFirst();
+	    orderdetails.beforeFirst();
+
+	    while (products.next()) {
+		String productCode = products.getString("productCode"); 
+
+		int orderCount = 0;
+		double orderTotal = 0; 
+
+		orderdetails.beforeFirst();
+		while (orderdetails.next()) {
+		    String orderProductCode = orderdetails.getString("productCode");
+		    double priceEach = orderdetails.getDouble("priceEach");
+		    int quantityOrdered = orderdetails.getInt("quantityOrdered");
+		    if (productCode.equals(orderProductCode)) {
+			orderCount += 1;
+			orderTotal += priceEach * quantityOrdered;
+		    }
+		}
+
+		System.out.println("Product Code: " + productCode + "\n" +
+				   "Number of Times Ordered: " + orderCount + "\n" +
+				   "Total Profit: " + orderTotal + "\n");
+	    }	 	    
 	} 
 	// Handle exceptions
 	catch(Exception e){
@@ -106,8 +215,8 @@ public class result_set {
 	// Close resources
 	finally {
 	    try {
-		stmt.close();
-		// preparedStmt.close();
+		stmt1.close();
+		stmt2.close();
 		conn.close();
 	    } catch (SQLException e) {
 		e.printStackTrace();

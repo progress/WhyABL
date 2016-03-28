@@ -1,5 +1,9 @@
-// TODO: Figure out a decent name.
-
+/* Why ABL Example
+   Authors: Bill Wood, Alan Estrada
+   File Name: BasicQuery/temptable.p
+   Version 1.03
+*/
+  
 DEFINE TEMP-TABLE ttitem NO-UNDO LIKE ITEM.
 DEFINE TEMP-TABLE ttorderline NO-UNDO LIKE ORDERLINE.
 
@@ -21,19 +25,24 @@ END.
 
 /* Navigate through the records */
 FIND FIRST ttitem WHERE ttitem.minqty >= 5.
+DISPLAY ttitem. 
+
 FIND LAST ttorderline WHERE ttorderline.itemnum = 14.
+DISPLAY ttoderline.
+
 FIND PREV ttorderline WHERE ttorderline.itemnum = 14.
+DISPLAY ttoderline.
 
 /* Sort from highest weight to lowest and filter out 
-   items where we have stock less than 10000 */
-FOR EACH ttitem WHERE ttitem.onhand > 10000 
+   items where we have stock less than 5000 */
+FOR EACH ttitem WHERE ttitem.onhand > 5000 
     BY ttitem.weight DESCENDING:
     DISPLAY ttitem. 
 END.
 
-/* Find a subset of items that have been ordered more than 100 times
+/* Find a subset of items that have been ordered more than 50 times
    in a single order. */
-FOR EACH ttorderline WHERE ttorderline.qty >= 100,
+FOR EACH ttorderline WHERE ttorderline.qty >= 50,
     EACH ttitem WHERE ttorderline.itemnum = ttitem.itemnum:
     DISPLAY ttitem.itemname ttitem.itemnum ttorderline.qty.
 END.
