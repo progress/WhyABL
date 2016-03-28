@@ -5,3 +5,5 @@ This file contains a comparisons between using temptables, result sets, and ORMS
 1. There is no way to easily sort result sets easily. Using Collections' sort functionality is fine but a conversion from a result set to an object is still necessary. This entails doing some sort of ad-hoc object-relational mapping as well as writing a sort function. Though it is trivial, it is still tedious.
 
 2. There are no way to do joins on result sets. A nested for loop can do a pseudo-join but it will take much longer and is much more inefficient than using ABL's temp-table joins.
+
+3. Query functionality like ABL's ACCUMULATE or SQL's GROUP BY is not available to result sets. Code needs to be written to create this functionality for result sets, increasing redundancy.
