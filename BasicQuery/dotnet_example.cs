@@ -5,8 +5,8 @@
 // 
 // This is the C# equivalent of this slice of ABL code:
 //
-// FOR EACH Customer WHERE Customer.SalesRep = repname:
-//     IF Balance > CreditLimit THEN Balance = Balance + 5.
+// FOR EACH Customer WHERE Customer.SalesRep = repname AND Balance > maxBalance:
+//     Discount = 0.
 // END.
 
 using System;
@@ -27,14 +27,16 @@ namespace ConsoleApplication1
             MySqlTransaction tr = null;
 
             int salesRep = 1702;
+	    double maxBalance = 100000;
+
             try
             {
                 // Open the connection to the database
                 conn.Open();
 
                 String update = "UPDATE customers " +
-                    "SET BALANCE = BALANCE + 0.05 " +
-                    "WHERE SALESREPEMPLOYEENUMBER = @salesRep AND BALANCE > CREDITLIMIT";
+                    "SET DISCOUNT = 0 " +
+                    "WHERE SALESREPEMPLOYEENUMBER = @salesRep AND BALANCE > @maxBalance";
 
                 // Begin a transaction
                 tr = conn.BeginTransaction();
@@ -46,6 +48,7 @@ namespace ConsoleApplication1
 
                 cmd.CommandText = update;
                 cmd.Parameters.AddWithValue("@salesRep", salesRep);
+                cmd.Parameters.AddWithValue("@maxBalance", maxBalance);
 
                 // Execute the query and commit it if we don't throw anything
                 cmd.ExecuteNonQuery();

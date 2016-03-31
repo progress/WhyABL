@@ -1,7 +1,6 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
 // File Name: BasicQuery/java_example.java
-// Version 11.6.1
 // 
 // This is the Java equivalent of this slice of ABL code:
 //
@@ -18,13 +17,14 @@ public class java_example {
 
     // Database credentials
     static final String USER = "root";
-    static final String PASS = "";
+    static final String PASS = "password";
    
     public static void main(String[] args) {
 	Connection conn = null;
 	PreparedStatement preparedStmt = null;
 	int i = 1702;
-
+	double maxBalance = 100000; 
+	String sql;
 	try {
 	    // Register JDBC driver
 	    Class.forName("com.mysql.jdbc.Driver");
@@ -34,19 +34,21 @@ public class java_example {
 	    conn.setAutoCommit(false);
 
 	    // Execute a query
-        String update =
-        "UPDATE customers " +
-        "SET BALANCE = BALANCE + 0.05 " +
-        "WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
-		    
-		preparedStmt = conn.prepareStatement(update);
-		    
-		// Replace the format specifier with a value
-		preparedStmt.setInt(1, i);
-		
-		preparedStmt.executeUpdate();
-		conn.commit();
-		System.out.println("Executed update");
+	    sql =
+		"UPDATE customers " +
+		"SET DISCOUNT = 0 " +
+		"WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > ?";
+	    
+	    preparedStmt = conn.prepareStatement(sql);
+
+	    // Replace the format specifiers with a value
+	    preparedStmt.setInt(1, i);
+	    preparedStmt.setDouble(2, maxBalance);
+	    
+	    preparedStmt.executeUpdate();
+
+	    conn.commit();
+	    System.out.println("Executed update");
 	} 
 	// Handle exceptions
 	catch(Exception e){
