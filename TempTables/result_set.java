@@ -38,7 +38,7 @@ public class result_set {
 
 	try {
 	    // Register JDBC driver
-	    Class.forName("com.mysql.jdbc.Driver");
+	    Class.forName("JDBC_DRIVER");
 
 	    // Open a connection
 	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
