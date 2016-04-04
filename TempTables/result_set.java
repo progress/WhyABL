@@ -146,7 +146,7 @@ public class result_set {
 	    }
 
  	    // This section is analogous to the ABL code:
-	    // FOR EACH orderdetails WHERE orderdetails.quantity >= 100,
+	    // FOR EACH orderdetails WHERE orderdetails.quantityOrdered >= 50,
 	    //     EACH products WHERE products.productCode = orderdetails.productCode:
 	    //     DISPLAY products.productName products.productCode orderdetails.quantityOrdered.
 	    // END.

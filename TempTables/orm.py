@@ -1,10 +1,11 @@
 import sys
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, Text, ForeignKey, desc,\
+    create_engine, func
 from sqlalchemy.dialects.mysql import DOUBLE, SMALLINT
 from sqlalchemy.orm import sessionmaker, relationship
-import sqlalchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 
 # Create the mappings
@@ -19,10 +20,23 @@ class Products(Base):
     productLine = Column(String(50))
     productScale = Column(String(10))
     productVendor = Column(String(50))
-    productDescription = Text()
-    quantityInStock = SMALLINT(6)
-    buyPrice = DOUBLE()
-    MSRP = DOUBLE()
+    productDescription = Column(Text())
+    quantityInStock = Column(SMALLINT(6))
+    buyPrice = Column(DOUBLE())
+    MSRP = Column(DOUBLE())
+
+    def __repr__(self):
+        return """<Product(productCode: {}, productName: {}, productLine: {},     
+        ProductScale: {}, productVendor: {}, productDescription: {},
+        quantityInStock: {}, buyPrice: {}, MSRP: {}""".format(self.productCode,
+                                                              self.productName,
+                                                              self.productLine,
+                                                              self.productScale,
+                                                              self.productVendor,
+                                                              self.productDescription,
+                                                              self.quantityInStock,
+                                                              self.buyPrice,
+                                                              self.MSRP)
 
 # The object to represent a record in the 'orderdetails' table 
 class OrderDetails(Base):
@@ -31,14 +45,22 @@ class OrderDetails(Base):
     orderNumber = Column(Integer, primary_key=True)
     productCode = Column(String(15), ForeignKey('products.productCode'))
     quantityOrdered = Column(Integer)
-    priceEach = DOUBLE()
-    orderLineNumber = SMALLINT(6)
+    priceEach = Column(DOUBLE())
+    orderLineNumber = Column(SMALLINT(6))
 
     products = relationship("Products")
 
+    def __repr__(self):
+        return """orderNumber: {}, productCode: {}, quantityOrdered: {}, 
+        priceEach: {}, orderLineNumber: {}""".format(self.orderNumber,
+                                                     self.productCode,
+                                                     self.quantityOrdered,
+                                                     self.priceEach,
+                                                     self.orderLineNumber)
+
 try:
     # Create an engine that connects us to the database
-    engine = sqlalchemy.create_engine("mysql://root@localhost/classicmodels")
+    engine = create_engine("mysql://root@localhost/classicmodels")
         
     # Create a session that acts as the intermediary between the database
     # and local changes
@@ -46,20 +68,70 @@ try:
     session = Session() 
     
     # Query the database for all the records in 'produts' and 'orderdetails'
+    # and put them in respective query objects
     products = session.query(Products)
     orderdetails = session.query(OrderDetails)
 
+    # This section is analagous to the ABL code:
+    # FIND FIRST product where productVendor = Classic Metal Creations.
+    query = products.filter(Products.productVendor == 'Classic Metal Creations')
+    print query[0]
+
+    # This section is analagous to the ABL code:
+    # FIND LAST orderdetails where productCode = 'S18_3232'.    
+    index = -1 
+    print query[index]
+
+    # This section is analagous to the ABL code:
+    # FIND PREV orderdetails where productCode = 'S18_3232'
+    index += -1
+    print query[index]
+
+    # This section (and the class MSRPCompare) is analagous to the
+    # ABL code:
+    # FOR EACH products WHERE products.quantityInStock > 5000 
+    #    BY products.MSRP DESCENDING:
+    #    DISPLAY products. 
+    # END.
+
+    for product in products.filter(Products.quantityInStock > 5000).\
+        order_by(Products.MSRP.desc()):
+        print product
+
+    # This section is analogous to the ABL code:
+    # FOR EACH orderdetails WHERE orderdetails.quantityOrdered >= 50,
+    #     EACH products WHERE products.productCode = orderdetails.productCode:
+    #     DISPLAY products.productName products.productCode orderdetails.quantityOrdered.
+    # END.
+
+    # Aside from doing a nested for-loop, you can query the database again with a join:
+    # for p, o in session.query(Products, OrderDetails).filter(OrderDetails.quantityOrdered >= 50) 
+    #    print p.productName, p.productCode, o.quantityOrdered
+
+    query = orderdetails.filter(OrderDetails.quantityOrdered >= 50)
+
     for product in products:
-        print product.productCode, product.productName
+        for orderdetail in query.filter(OrderDetails.productCode == product.productCode):
+            print product.productName, product.productCode, orderdetail.quantityOrdered
 
-    for detail in orderdetails:
-        print detail.productCode, detail.orderNumber
- 
-    session.close()
+    # This section is analagous to the ABL code:
+    # FOR EACH products:
+    #     FOR EACH orderdetails WHERE orderdetails.productCode = products.productCode:
+    #         ACCUMULATE orderdetails.orderNumber (COUNT).
+    #         ACCUMULATE orderdetails.quantityOrdered (TOTAL).
+    #     END.
+    #     DISPLAY products.productName (ACCUM COUNT orderdetails.orderNumber) 
+    #         (ACCUM TOTAL orderdetails.quantityOrdered).
+    # END.
+    
+    query = session.query(OrderDetails.productCode, 
+                          func.sum(OrderDetails.quantityOrdered), 
+                          func.count(OrderDetails.productCode)).group_by(OrderDetails.productCode)
 
-    print "Goodbye!"
+    for q in query:
+        print q
    
-except sqlalchemy.exc.SQLAlchemyError, e:  
+except SQLAlchemyError, e:  
     print e
     sys.exit(1)
 
