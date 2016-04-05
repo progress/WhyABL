@@ -104,14 +104,11 @@ try:
     #     DISPLAY products.productName products.productCode orderdetails.quantityOrdered.
     # END.
 
-    # Aside from doing a nested for-loop, you can query the database again with a join:
-    # session.query(Products, OrderDetails).filter(OrderDetails.quantityOrdered >= 50)
+    for o, p in orderdetails.outerjoin(Products, Products.productCode == OrderDetails.productCode)\
+                            .with_entities(OrderDetails, Products).\
+                            filter(OrderDetails.quantityOrdered >= 50):
+        print p.productName, p.productCode, o.quantityOrdered
 
-    query = orderdetails.filter(OrderDetails.quantityOrdered >= 50)
-
-    for product in products:
-        for orderdetail in query.filter(OrderDetails.productCode == product.productCode):
-            print product.productName, product.productCode, orderdetail.quantityOrdered
 
     # This section is analagous to the ABL code:
     # FOR EACH products:
@@ -123,22 +120,11 @@ try:
     #         (ACCUM TOTAL orderdetails.quantityOrdered).
     # END.
 
-    # You can query the database with a GROUP BY to achieve this as well, like so:
-    # session.query(OrderDetails.productCode, func.sum(OrderDetails.quantityOrdered), func.count(OrderDetails.productCode))\
-    #               .group_by(OrderDetails.productCode)
-
-    # Loop through each product's group of orderdetails to find the accumulated values
-    for product in products:
-        numberOfOrders = 0
-        quantityOrdered = 0
-
-        for orderdetail in orderdetails.filter(OrderDetails.productCode == product.productCode):
-            numberOfOrders += 1
-            quantityOrdered += orderdetail.quantityOrdered        
-
-        print "Product: {}, Number of Orders: {}, Quantity Ordered: {}".\
-            format(product.productCode, numberOfOrders, quantityOrdered)            
-
+    for productCode, numOrders, quantityOrdered in orderdetails.with_entities(
+            OrderDetails.productCode, 
+            func.count(OrderDetails.productCode),
+            func.sum(OrderDetails.quantityOrdered)).group_by(OrderDetails.productCode):
+        print productCode, numOrders, quantityOrdered
    
 except SQLAlchemyError, e:  
     print e
