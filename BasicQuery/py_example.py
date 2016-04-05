@@ -10,20 +10,20 @@
 import MySQLdb as mdb
 
 salesrep = 1702
-maxBalance = 100000
+creditFactor = 1.05
 
 # Python's try block implicitly gives transactional scoping
 try:
-    db = mdb.connect('localhost', 'root', 'password', 'classicmodels')
+    db = mdb.connect('localhost', 'root', '', 'classicmodels')
     
     # Create a cursor object to keep track of result set
     cur = db.cursor()
 
     # Execute the query
     cur.execute("UPDATE customers \
-                 SET DISCOUNT = 0 \
-                 WHERE SALESREPEMPLOYEENUMBER = %s AND BALANCE > %s",
-                (salesrep, maxBalance))
+                 SET BALANCE = BALANCE * %s \
+                 WHERE SALESREPEMPLOYEENUMBER = %s AND BALANCE > CREDITLIMIT",
+                (creditFactor, salesRep))
     
     # Commit the changes 
     db.commit()

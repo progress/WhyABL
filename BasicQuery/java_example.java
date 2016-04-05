@@ -22,28 +22,29 @@ public class java_example {
     public static void main(String[] args) {
 	Connection conn = null;
 	PreparedStatement preparedStmt = null;
-	int i = 1702;
-	double maxBalance = 100000; 
-	String sql;
+
 	try {
 	    // Register JDBC driver
-	    Class.forName("com.mysql.jdbc.Driver");
+	    Class.forName(JDBC_DRIVER);
 
 	    // Open a connection
 	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
 	    conn.setAutoCommit(false);
 
 	    // Execute a query
-	    sql =
+	    String sql =
 		"UPDATE customers " +
-		"SET DISCOUNT = 0 " +
-		"WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > ?";
+		"SET BALANCE = BALANCE * ?" +
+		"WHERE SALESREPEMPLOYEENUMBER = ? AND BALANCE > CREDITLIMIT";
 	    
 	    preparedStmt = conn.prepareStatement(sql);
 
 	    // Replace the format specifiers with a value
-	    preparedStmt.setInt(1, i);
-	    preparedStmt.setDouble(2, maxBalance);
+	    double creditFactor = 1.05; 
+	    preparedStmt.setDouble(1, creditFactor);
+
+	    int salesRep = 1702;
+	    preparedStmt.setInt(2, salesRep);
 	    
 	    preparedStmt.executeUpdate();
 
@@ -64,6 +65,10 @@ public class java_example {
 	finally {
 	    try {
 		preparedStmt.close();
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	    try {
 		conn.close();
 	    } catch (SQLException e) {
 		e.printStackTrace();

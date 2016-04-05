@@ -27,7 +27,7 @@ namespace ConsoleApplication1
             MySqlTransaction tr = null;
 
             int salesRep = 1702;
-	    double maxBalance = 100000;
+	    double creditFactor = 1.05;
 
             try
             {
@@ -35,8 +35,8 @@ namespace ConsoleApplication1
                 conn.Open();
 
                 String update = "UPDATE customers " +
-                    "SET DISCOUNT = 0 " +
-                    "WHERE SALESREPEMPLOYEENUMBER = @salesRep AND BALANCE > @maxBalance";
+                    "SET BALANCE = BALANCE * @creditFactor " +
+                    "WHERE SALESREPEMPLOYEENUMBER = @salesRep AND BALANCE > CREDITLIMIT";
 
                 // Begin a transaction
                 tr = conn.BeginTransaction();
@@ -46,9 +46,10 @@ namespace ConsoleApplication1
                 cmd.Connection = conn;
                 cmd.Transaction = tr;
 
-                cmd.CommandText = update;
+ 		cmd.CommandText = update; 
+                cmd.Parameters.AddWithValue("@creditFactor", creditFactor);
                 cmd.Parameters.AddWithValue("@salesRep", salesRep);
-                cmd.Parameters.AddWithValue("@maxBalance", maxBalance);
+
 
                 // Execute the query and commit it if we don't throw anything
                 cmd.ExecuteNonQuery();
