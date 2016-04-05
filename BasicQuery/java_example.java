@@ -17,7 +17,7 @@ public class java_example {
 
     // Database credentials
     static final String USER = "root";
-    static final String PASS = "password";
+    static final String PASS = "";
    
     public static void main(String[] args) {
 	Connection conn = null;

@@ -22,23 +22,20 @@ public class result_set {
 
     // Database credentials
     static final String USER = "root";
-    static final String PASS = "password";
+    static final String PASS = "";
    
     public static void main(String[] args) {
-	Connection conn = null;
-	Statement stmt1 = null;
-	Statement stmt2 = null;
-	ResultSet products = null;
-	ResultSet orderdetails = null;
-	String sql; 
-
 	// An array list of an array list of strings is how we're going to
 	// have to represent a table.
-	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>(); 
+	ArrayList<List<String>> table = new ArrayList<List<String>>(); 
+
+	Statement stmt1 = null;
+	Statement stmt2 = null;
+	Connection conn = null;
 
 	try {
 	    // Register JDBC driver
-	    Class.forName("JDBC_DRIVER");
+	    Class.forName(JDBC_DRIVER);
 
 	    // Open a connection
 	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
@@ -47,11 +44,11 @@ public class result_set {
 	    stmt2 = conn.createStatement();
 
 	    // Store the tables products and orderdetails locally
-	    sql = "SELECT * FROM products";
-	    products = stmt1.executeQuery(sql);
+	    String sql = "SELECT * FROM products";
+	    ResultSet products = stmt1.executeQuery(sql);
 
 	    sql = "SELECT * FROM orderdetails";
-	    orderdetails = stmt2.executeQuery(sql);
+	    ResultSet orderdetails = stmt2.executeQuery(sql);
 
 	    // This section is analagous to the ABL code:
 	    // FIND FIRST product where productVendor = Classic Metal Creations.
@@ -140,7 +137,7 @@ public class result_set {
 	    Collections.sort(table, new MSRPCompare()) ;
 	      
 	    // Print out our sorted result set.
-	    for (ArrayList<String> row : table) {	       
+	    for (List<String> row : table) {	       
 		System.out.println("Product Name: " + row.get(1) + "\n" +
 				   "MSRP: " + row.get(6) + "\n");
 	    }
@@ -216,7 +213,15 @@ public class result_set {
 	finally {
 	    try {
 		stmt1.close();
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	    try {
 		stmt2.close();
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	    try {
 		conn.close();
 	    } catch (SQLException e) {
 		e.printStackTrace();
@@ -228,10 +233,10 @@ public class result_set {
 
 // This class implements the comparison function that Collections
 // will use to sort the rows based on MSRP 
-class MSRPCompare implements Comparator<ArrayList<String>> {
+class MSRPCompare implements Comparator<List<String>> {
     
     @Override
-    public int compare(ArrayList<String> al1, ArrayList<String> al2) {
+    public int compare(List<String> al1, List<String> al2) {
 	// Compare the MSRP of the row and return the higher one
 	boolean result = Double.parseDouble(al1.get(6)) < Double.parseDouble(al2.get(6));
 	return result ? 1 : -1 ; 

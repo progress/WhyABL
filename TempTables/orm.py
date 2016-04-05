@@ -105,8 +105,7 @@ try:
     # END.
 
     # Aside from doing a nested for-loop, you can query the database again with a join:
-    # for p, o in session.query(Products, OrderDetails).filter(OrderDetails.quantityOrdered >= 50) 
-    #    print p.productName, p.productCode, o.quantityOrdered
+    # session.query(Products, OrderDetails).filter(OrderDetails.quantityOrdered >= 50)
 
     query = orderdetails.filter(OrderDetails.quantityOrdered >= 50)
 
@@ -123,13 +122,23 @@ try:
     #     DISPLAY products.productName (ACCUM COUNT orderdetails.orderNumber) 
     #         (ACCUM TOTAL orderdetails.quantityOrdered).
     # END.
-    
-    query = session.query(OrderDetails.productCode, 
-                          func.sum(OrderDetails.quantityOrdered), 
-                          func.count(OrderDetails.productCode)).group_by(OrderDetails.productCode)
 
-    for q in query:
-        print q
+    # You can query the database with a GROUP BY to achieve this as well, like so:
+    # session.query(OrderDetails.productCode, func.sum(OrderDetails.quantityOrdered), func.count(OrderDetails.productCode))\
+    #               .group_by(OrderDetails.productCode)
+
+    # Loop through each product's group of orderdetails to find the accumulated values
+    for product in products:
+        numberOfOrders = 0
+        quantityOrdered = 0
+
+        for orderdetail in orderdetails.filter(OrderDetails.productCode == product.productCode):
+            numberOfOrders += 1
+            quantityOrdered += orderdetail.quantityOrdered        
+
+        print "Product: {}, Number of Orders: {}, Quantity Ordered: {}".\
+            format(product.productCode, numberOfOrders, quantityOrdered)            
+
    
 except SQLAlchemyError, e:  
     print e
