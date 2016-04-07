@@ -1,11 +1,12 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
 // File Name: BasicQuery/java_example.java
+// Version 1.02
 // 
 // This is the Java equivalent of this slice of ABL code:
 //
-// FOR EACH Customer WHERE Customer.SalesRep = repname:
-//     IF Balance > CreditLimit THEN Balance = Balance + 5.
+// FOR EACH Customer WHERE SalesRep = repname AND Balance > CreditLimit:
+//     Balance = Balance * creditFactor.
 // END.
 
 import java.sql.*;

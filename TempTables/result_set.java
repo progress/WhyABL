@@ -1,7 +1,7 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
    File Name: TempTable/result_set.java
-   Version: 1.0
+   Version: 1.02
 
    This example aims to show the added difficulty of navigating,
    sorting, and filtering through result sets from queries. 
