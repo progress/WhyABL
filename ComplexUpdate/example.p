@@ -1,10 +1,11 @@
-// Why ABL Example
-// Authors: Bill Wood, Alan Estrada
-// File Name: ComplexUpdate/complex.p
-// Version 11.6.1
-// 
-// This .p shows the usefulness of ABL transactions
-// in complex database manipulations.
+/* Why ABL Example
+   Authors: Bill Wood, Alan Estrada
+   File Name: ComplexUpdate/example.p
+   Version 11.02
+   
+   This .p shows the usefulness of ABL transactions
+   in complex database manipulations.
+*/
 
 DEFINE VARIABLE id AS INTEGER INITIAL 0.
 DEFINE VARIABLE ref-cust-num AS INTEGER INITIAL 0.
