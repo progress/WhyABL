@@ -2,7 +2,6 @@
 // Authors: Bill Wood, Alan Estrada
 // File Name: ComplexUpdate/java_example.java
 // Version 1.02
-// 
 
 import java.sql.*;
 
