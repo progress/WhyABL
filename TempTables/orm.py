@@ -104,7 +104,7 @@ try:
     #     DISPLAY products.productName products.productCode orderdetails.quantityOrdered.
     # END.
 
-    for o, p in orderdetails.outerjoin(Products, Products.productCode == OrderDetails.productCode)\
+    for o, p in orderdetails.join(Products, Products.productCode == OrderDetails.productCode)\
                             .with_entities(OrderDetails, Products).\
                             filter(OrderDetails.quantityOrdered >= 50):
         print p.productName, p.productCode, o.quantityOrdered
