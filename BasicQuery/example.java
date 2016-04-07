@@ -8,6 +8,7 @@
 // FOR EACH Customer WHERE SalesRep = repname AND Balance > CreditLimit:
 //     Balance = Balance * creditFactor.
 // END.
+//
 
 import java.sql.*;
 
