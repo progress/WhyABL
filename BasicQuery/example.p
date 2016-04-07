@@ -1,7 +1,7 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
-   File Name: BasicQuery/abl_example.p
-   Version 1.02 
+   File Name: BasicQuery/example.p
+   Version 1.03
  
    This .p shows how simple it is to make queries in ABL with very little
    redundancies and boilerplate code.

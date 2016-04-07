@@ -1,15 +1,15 @@
 # Why ABL Example
 # Authors: Bill Wood, Alan Estrada
-# File Name: BasicQuery/py_example.py
+# File Name: BasicQuery/example.py
 # 
 # This is the Python equivalent of this slice of ABL code:
-# FOR EACH Customer WHERE Customer.SalesRep = repname AND Balance > maxBalance:
-#     Discount = 0.
+# FOR EACH Customer WHERE salesRepEmployeeNumber = salesRep AND Balance > creditLimit:
+#     Balance = Balance * creditFactor;
 # END.
 
 import MySQLdb as mdb
 
-salesrep = 1702
+salesRep = 1702
 creditFactor = 1.05
 
 # Python's try block implicitly gives transactional scoping

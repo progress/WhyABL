@@ -1,6 +1,6 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
-// File Name: BasicQuery/java_example.java
+// File Name: BasicQuery/example.java
 // Version 1.02
 // 
 // This is the Java equivalent of this slice of ABL code:
@@ -11,7 +11,7 @@
 
 import java.sql.*;
 
-public class java_example {
+public class example {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
     static final String DB_URL = "jdbc:mysql://localhost/classicmodels";

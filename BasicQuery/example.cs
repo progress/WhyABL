@@ -1,7 +1,7 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
-// File Name: BasicQuery/dotnet_example.cs
-// Version 11.6.1
+// File Name: BasicQuery/example.cs
+// Version 1.03
 // 
 // This is the C# equivalent of this slice of ABL code:
 //
@@ -49,7 +49,6 @@ namespace ConsoleApplication1
  		cmd.CommandText = update; 
                 cmd.Parameters.AddWithValue("@creditFactor", creditFactor);
                 cmd.Parameters.AddWithValue("@salesRep", salesRep);
-
 
                 // Execute the query and commit it if we don't throw anything
                 cmd.ExecuteNonQuery();
