@@ -1,12 +1,12 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
 // File Name: ComplexUpdate/java_example.java
-// Version 11.6.1
+// Version 1.02
 // 
 
 import java.sql.*;
 
-public class java_example {
+public class example {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
     static final String DB_URL = "jdbc:mysql://localhost/classicmodels";
@@ -36,7 +36,7 @@ public class java_example {
 
 	try {
 	    // Register JDBC driver
-	    Class.forName("com.mysql.jdbc.Driver");
+	    Class.forName(JDBC_DRIVER);
 
 	    // Open a connection
 	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
