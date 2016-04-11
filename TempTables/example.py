@@ -1,3 +1,10 @@
+# Why ABL Example
+# Authors: Bill Wood, Alan Estrada
+# File Name: TempTables/example.py
+# 
+# This shows the difference between using ORM's versus
+# ABL's built-in temp-tables.
+
 import sys
 
 from sqlalchemy.ext.declarative import declarative_base
