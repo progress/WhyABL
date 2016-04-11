@@ -1,6 +1,6 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
-   File Name: BasicQuery/temptable.p
+   File Name: BasicQuery/example.p
    Version 1.03
 */
   

@@ -1,6 +1,6 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
-   File Name: TempTable/result_set.java
+   File Name: TempTable/example.java
    Version: 1.02
 
    This example aims to show the added difficulty of navigating,
@@ -15,7 +15,7 @@
 import java.sql.*;
 import java.util.*;
 
-public class result_set {
+public class example {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
     static final String DB_URL = "jdbc:mysql://localhost/classicmodels";
