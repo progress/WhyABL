@@ -13,8 +13,7 @@ END.
 
 /* After being given a list of customers who have moved to a new region,
    go through each moved customer and assign them the sales rep of that
-   region.
-*/
+   region. */
 
 FOR EACH prime:
    FIND Customer WHERE Customer.CustNum = prime.id.
