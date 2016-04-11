@@ -1,3 +1,9 @@
+/* Why ABL Example
+   Authors: Bill Wood, Alan Estrada
+   File Name: BasicQuery/example2.p
+   Version 1.01
+*/
+
 DEFINE temp-table primes
    FIELD id like customer.customerNumber
    FIELD region like salesRep.region
