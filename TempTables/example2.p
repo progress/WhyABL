@@ -5,8 +5,8 @@
 */
 
 DEFINE temp-table primes
-   FIELD id like customer.customerNumber
-   FIELD region like salesRep.region
+   FIELD id like customer.CustNum
+   FIELD newRep like salesRep.RepName.
 END.
 
 // Read in the numbers from a file
@@ -17,6 +17,6 @@ END.
 
 FOR EACH prime:
    FIND Customer WHERE Customer.CustNum = prime.customerNumber.
-   FIND SalesRep WHERE SalesRep.region = prime.region.
+   FIND SalesRep WHERE SalesRep.RepName = prime.newRep.
    Customer.SalesRep = SalesRep.SalesRep.
 END.
