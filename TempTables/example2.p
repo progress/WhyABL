@@ -17,6 +17,6 @@ END.
 
 FOR EACH prime:
    FIND Customer WHERE Customer.CustNum = prime.customerNumber.
-   FIND SalesRep WHERE SalesRep.region= prime.region.
+   FIND SalesRep WHERE SalesRep.region = prime.region.
    Customer.SalesRep = SalesRep.SalesRep.
 END.
