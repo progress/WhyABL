@@ -6,6 +6,7 @@
 
 import MySQLdb as mdb
 
+# TODO: Change to primeCustomers (don't use TempTable).
 class TempTable:
     customerNumber = 0
     email = 0
