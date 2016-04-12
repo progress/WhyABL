@@ -12,8 +12,7 @@ END.
 // Read in the numbers from a file
 
 /* Case 1: Get a list of all the Customers we are going to impact. */
-FOR EACH prime:
-   FIND FIRST Customer WHERE Customer.CustNum = prime.id BY prime.id.
+FOR EACH prime, FIRST Customer WHERE Customer.CustNum = prime.id BY prime.id.
    DISPLAY prime.customerNumber Customer.Name.
 END.
 
