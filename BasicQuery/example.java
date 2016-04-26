@@ -1,21 +1,20 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
 // File Name: BasicQuery/example.java
-// Version 1.02
+// Version 1.04
 // 
 // This is the Java equivalent of this slice of ABL code:
 //
 // FOR EACH Customer WHERE SalesRep = repname AND Balance > CreditLimit:
-//     Balance = Balance * creditFactor.
+//    Balance = Balance * creditFactor.
 // END.
-//
 
 import java.sql.*;
 
 public class example {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-    static final String DB_URL = "jdbc:mysql://localhost/classicmodels";
+    static final String DB_URL = "jdbc:mysql://localhost/sports2000";
 
     // Database credentials
     static final String USER = "root";
@@ -45,8 +44,8 @@ public class example {
 	    double creditFactor = 1.05; 
 	    preparedStmt.setDouble(1, creditFactor);
 
-	    int salesRep = 1702;
-	    preparedStmt.setInt(2, salesRep);
+	    String repName = "GPE";
+	    preparedStmt.setString(2, repName);
 	    
 	    preparedStmt.executeUpdate();
 

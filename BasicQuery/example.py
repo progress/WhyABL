@@ -1,20 +1,21 @@
 # Why ABL Example
 # Authors: Bill Wood, Alan Estrada
 # File Name: BasicQuery/example.py
-# 
+# Version 1.04 
+#
 # This is the Python equivalent of this slice of ABL code:
-# FOR EACH Customer WHERE salesRepEmployeeNumber = salesRep AND Balance > creditLimit:
-#     Balance = Balance * creditFactor;
+# FOR EACH Customer WHERE SalesRep = repname AND Balance > CreditLimit:
+#    Balance = Balance * creditFactor.
 # END.
 
 import MySQLdb as mdb
 
-salesRep = 1702
+repName = "GPE"
 creditFactor = 1.05
 
 # Python's try block implicitly gives transactional scoping
 try:
-    db = mdb.connect('localhost', 'root', '', 'classicmodels')
+    db = mdb.connect('localhost', 'root', '', 'sports2000')
     
     # Create a cursor object to keep track of result set
     cur = db.cursor()
@@ -23,7 +24,7 @@ try:
     cur.execute("UPDATE customers \
                  SET BALANCE = BALANCE * %s \
                  WHERE SALESREPEMPLOYEENUMBER = %s AND BALANCE > CREDITLIMIT",
-                (creditFactor, salesRep))
+                (creditFactor, repName))
     
     # Commit the changes 
     db.commit()

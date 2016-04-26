@@ -1,12 +1,10 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
 // File Name: BasicQuery/example.cs
-// Version 1.03
+// Version 1.04
 // 
-// This is the C# equivalent of this slice of ABL code:
-//
-// FOR EACH Customer WHERE Customer.SalesRep = repname AND Balance > maxBalance:
-//     Discount = 0.
+// FOR EACH Customer WHERE SalesRep = repname AND Balance > CreditLimit:
+//    Balance = Balance * creditFactor.
 // END.
 
 using System;
@@ -22,12 +20,12 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            string connStr = "server=localhost;user=root;database=classicmodels;port=3306;password=password;";
+            string connStr = "server=localhost;user=root;database=classicmodels;port=3306;password='';";
             MySqlConnection conn = new MySqlConnection(connStr);
             MySqlTransaction tr = null;
 
-            int salesRep = 1702;
-	    double creditFactor = 1.05;
+            string repName = "GPE";
+            double creditFactor = 1.05;
 
             try
             {
@@ -36,7 +34,7 @@ namespace ConsoleApplication1
 
                 String update = "UPDATE customers " +
                     "SET BALANCE = BALANCE * @creditFactor " +
-                    "WHERE SALESREPEMPLOYEENUMBER = @salesRep AND BALANCE > CREDITLIMIT";
+                    "WHERE SALESREPEMPLOYEENUMBER = @repName AND BALANCE > CREDITLIMIT";
 
                 // Begin a transaction
                 tr = conn.BeginTransaction();
@@ -46,9 +44,9 @@ namespace ConsoleApplication1
                 cmd.Connection = conn;
                 cmd.Transaction = tr;
 
- 		cmd.CommandText = update; 
+                cmd.CommandText = update; 
                 cmd.Parameters.AddWithValue("@creditFactor", creditFactor);
-                cmd.Parameters.AddWithValue("@salesRep", salesRep);
+                cmd.Parameters.AddWithValue("@repName", repName);
 
                 // Execute the query and commit it if we don't throw anything
                 cmd.ExecuteNonQuery();
