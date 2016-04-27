@@ -1,49 +1,40 @@
 # Why ABL Example
 # Authors: Bill Wood, Alan Estrada
 # File Name: ComplexQuery/example.py
-# Version 1.03
+# Version 1.04
 # 
-# This is the Python equivalent of this slice of ABL code:
-#
-# FOR EACH employee,
-#    EACH customers OF employee,
-#        EACH orders OF customers WHERE orders.orderStatus = "In Process" OR
-#        (orders.orderStatus = "Shipped" AND INTERVAL(orders.shippedDate, shipDate, "days") <= 31),
-#            EACH orderdetail OF orders WHERE orderdetails.productCode = "S24_2300":
-#                DISPLAY 
-#                    employees.employeeNumber
-#                    customers.customerName
-#                    orders.orderNumber 
-#                    orderdetails.priceEach.
-# END.
+# This is the Python equivalent of ComplexQuery/example.p
 
 import MySQLdb as mdb
 
-shipDate = '2005-04-07'
+shipDate = '1999-09-19'
 
 try:
-    con = mdb.connect('localhost', 'root', '', 'classicmodels')
+    con = mdb.connect('localhost', 'root', '', 'sports2000')
     cur = con.cursor(mdb.cursors.DictCursor)
 
     # Join on 4 tables
     # We do an join the Employees, Customers, Orders, and OrderDetails tables
     # and then sort out all the orders where we are processing orders and the order
     # contains a specific product
-    sql = "SELECT * FROM employees JOIN customers ON customers.salesRepEmployeeNumber = employees.employeeNumber " + \
-          "JOIN orders ON orders.customerNumber = customers.customerNumber " + \
-          "JOIN orderdetails ON orderdetails.orderNumber = orders.orderNumber " + \
-          "WHERE (orders.status = 'In Process' OR ABS(DATEDIFF(orders.shippedDate, {})) <= 31) ".format(shipDate) + \
-          "AND orderdetails.productCode = 'S24_2300';"
+    sql = "SELECT * FROM salesrep JOIN customer " + \
+        "ON customer.salesRep = salesrep.salesrep " + \
+        "JOIN order ON order.custNum = customer.custNum " + \
+        "JOIN orderline ON orderline.ordernum = order.orderNum " + \
+        "WHERE order.OrderStatus = 'Ordered' OR " + \
+        "(order.orderStatus = 'Shipped' AND " + \
+        "ABS(DATEDIFF(order.shipDate, {})) <= 31) ".format(shipDate) + \
+        "AND orderline.itemnum = 14;"
 
     cur.execute(sql)
 
     rows = cur.fetchall()
 
     for row in rows:
-        print "Employee Number: ", row['employeeNumber']
-        print "Customer Name: ", row['customerName']
-        print "Order Number: ", row['orderNumber']
-        print "Price Each: ", row['priceEach']
+        print "Rep Name: ", row['repName']
+        print "Customer Name: ", row['Name']
+        print "Order Number: ", row['ordernum']
+        print "Price: ", row['price']
 
     print "{} rows found".format(cur.rowcount)
 except:

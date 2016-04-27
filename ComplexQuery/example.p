@@ -1,9 +1,10 @@
-// Why ABL Example
-// Authors: Bill Wood, Alan Estrada
-// File Name: ComplexQuery/example.p
-// Version 1.03
-// 
-// This .p shows how simple complex joins can be when writen in OpenEdge ABL.
+/* Why ABL Example
+   Authors: Bill Wood, Alan Estrada
+   File Name: ComplexQuery/example.p
+   Version 1.04
+ 
+   This .p shows how simple complex joins can be when writen in OpenEdge ABL.
+*/
 
 DEF VAR shipDate AS DATE INITIAL 09/19/1999.
 
