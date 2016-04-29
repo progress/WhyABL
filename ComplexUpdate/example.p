@@ -1,7 +1,7 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
    File Name: ComplexUpdate/example.p
-   Version 11.02
+   Version 1.04
    
    This .p shows the usefulness of ABL transactions
    in complex database manipulations.
@@ -14,7 +14,7 @@ DEFINE BUFFER ref-cust FOR Customer.
 DEFINE BUFFER ord1 FOR order.
 DEFINE BUFFER ord2 FOR order.
 
-// Can be replaced with name or any other field.
+/* Can be replaced with name or any other field. */
 id = 3010.
 ref-cust-num = 1010. 
 
@@ -24,18 +24,18 @@ DO  TRANSACTION:
     IF NOT available(customer) THEN DO:
         CREATE customer.
         customer.custnum = id.
-        // Fill in customer fields.
+        /* Fill in customer fields. */
     END.
 
-    // Fill in order fields.
+    /* Fill in order fields. */
     CREATE order.
     order.custnum = customer.custnum.
     
-    // Fill in orderline fields.
+    /* Fill in orderline fields. */
     CREATE orderline.
     orderline.ordernum = order.ordernum.
     
-    // Give a $50 credit to the referring customer.
+    /* Give a $50 credit to the referring customer. */
     IF ref-cust-num > 0 THEN DO:
         FIND FIRST ref-cust WHERE ref-cust.custnum = ref-cust-num NO-ERROR.                                            
     
@@ -44,11 +44,11 @@ DO  TRANSACTION:
         END.
     END.
 
-    // Loop through all the records
+    /* Loop through all the records */
     FOR EACH ord1 WHERE ord1.custnum = customer.custnum:
         
-        // Find orders that happen in the same month
-        // and assign them the same ship date.
+        /* Find orders that happen in the same month 
+           and assign them the same ship date. */
         FIND FIRST ord2 WHERE 
             MONTH(ord1.shipdate) = MONTH(ord2.shipdate) AND 
             YEAR(ord1.shipdate) = YEAR(ord2.shipdate) NO-ERROR.
@@ -60,9 +60,6 @@ DO  TRANSACTION:
             ELSE DO: 
                 ord1.shipdate = ord2.shipdate.  
             END.
-
-            // Maybe decrease their balance to save
-            // on shipping here.
         END.
 
     END.

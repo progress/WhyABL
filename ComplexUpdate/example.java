@@ -1,155 +1,183 @@
 // Why ABL Example
 // Authors: Bill Wood, Alan Estrada
-// File Name: ComplexUpdate/java_example.java
-// Version 1.02
+// File Name: ComplexUpdate/example.java
+// Version 1.04
+//
+// This example is equivalent to the ABL procedure ComplexUpdate/example.p
 
 import java.sql.*;
 
 public class example {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-    static final String DB_URL = "jdbc:mysql://localhost/classicmodels";
+    static final String DB_URL = "jdbc:mysql://localhost/sports2000";
 
     // Database credentials
     static final String USER = "root";
-    static final String PASS = "password";
+    static final String PASS = "";
    
     public static void main(String[] args) {
-	Connection conn = null;
-	PreparedStatement preparedStmt = null;
-	Statement stmt;
-	ResultSet rs = null; 
-	ResultSet rs2 = null; 
+        PreparedStatement preparedStmt;
+        Statement stmt;
+        
+        try {
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
 
-	String sql = null;
-	java.sql.Date sqlDate = null;
-	java.sql.Date sqlDate2 = null;
-	
-	int salesRep = 1702;
-	int custNum = 999;
-	int referringCustNum = 450;
-	int orderNum = 20400; 
-	String productCode = "S18_2325"; 
-	int productQuantity = 5;
-	int orderline = 20111;
+            // Open a connection
+            Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            conn.setAutoCommit(false);
 
-	try {
-	    // Register JDBC driver
-	    Class.forName(JDBC_DRIVER);
+            stmt = conn.createStatement();
+            
+            // Find if customer exists
+            int custNum = 3010;
 
-	    // Open a connection
-	    conn = DriverManager.getConnection(DB_URL,USER,PASS);
-	    conn.setAutoCommit(false);
+            String sql = "SELECT * FROM customer where custNum = " + custNum;
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            // If customer doesn't exist, add the customer
+            if (!rs.isBeforeFirst()) {  
+                // Fill in fields with information
+                sql = "INSERT INTO customers " +
+                    "VALUES (?, 'Philippines', 'Susan Dune', " +
+                    "'29 Fake St', 'Extinct City', 'MA', '01733', 'USA'," +
+                    "null, '(555)555-5555', 'GPE', 10000, 0, null, 0, null, " +
+                    "null, 'sdune@fake.com')";
+                
+                preparedStmt = conn.prepareStatement(sql);
+                preparedStmt.setInt(1, custNum);
+                preparedStmt.executeUpdate();
+            }
 
-	    stmt = conn.createStatement();
+            // Find if referring customer exists
+            sql = "SELECT * FROM customer where custNum = " + referringCustNum;
+            rs = stmt.executeQuery(sql);
 
-	    // Find if customer exists
-	    sql = "SELECT * FROM customers where customerNumber = " + custNum;
-	    rs = stmt.executeQuery(sql);
+            // If customer does exist, give a $50 credit
+            if (rs.isBeforeFirst()) {  
+                int referringCustNum = 1010;
+    
+                sql = "UPDATE customer " +
+                    "SET balance = balance - 50 WHERE custNum = ?";
+                
+                preparedStmt = conn.prepareStatement(sql);
+                preparedStmt.setInt(1, referringCustNum);
+                preparedStmt.executeUpdate();
+            }
 
-	    // If customer doesn't exist, add the customer
-	    if (!rs.isBeforeFirst() ) {  
-		sql = "INSERT INTO customers " +
-		    "VALUES (?, 'Warehouse of Miriam', 'Dune', 'Sue', '5555555555', 'Fake Lane'," +
-		    "null, 'Exctinct City', 'MA', '55555', 'USA', ?, 8280, 1000)";
-		preparedStmt = conn.prepareStatement(sql);
-		preparedStmt.setInt(1, custNum);
-		preparedStmt.setInt(2, salesRep);
-		preparedStmt.executeUpdate();
-	    }
+            // Create order
+            int orderNum = 20400; 
+            
+            sql = "INSERT INTO order " +
+                "VALUES (?, ?, '2005-03-02', '2005-03-10'," +
+                "null, 'Fedex', null, null, 'GPE', null, null, " +
+                "'Ordered', 0, 'Visa')";
+            preparedStmt = conn.prepareStatement(sql);
+            
+            preparedStmt.setInt(1, orderNum);            
+            preparedStmt.setInt(2, custNum);
+            preparedStmt.executeUpdate();
 
-	    // Find if referring customer exists
-	    sql = "SELECT * FROM customers where customerNumber = " + referringCustNum;
-	    rs = stmt.executeQuery(sql);
+            // Create orderline
+            int itemnum = 54; 
+            
+            sql = "INSERT INTO orderdetails VALUES (?, 1, ?, null, 1," +
+                "0, null, 'Ordered')";
+            
+            preparedStmt = conn.prepareStatement(sql);
+            
+            preparedStmt.setInt(1, orderNum);
+            preparedStmt.setString(2, itemnum);
+            preparedStmt.executeUpdate();
 
-	    // If customer does exist, give a $50 credit
-	    if (rs.isBeforeFirst()) {  
-		sql = "UPDATE customers " +
-		    "SET balance = balance - 50 WHERE customerNumber = ?";
-		preparedStmt = conn.prepareStatement(sql);
-		preparedStmt.setInt(1, referringCustNum);
-		preparedStmt.executeUpdate();
-	    }
+            // Find all the orders of the customer
+            sql = "SELECT * FROM orders where custNum = " + custNum;
+            rs = stmt.executeQuery(sql); 
 
-	    // Create orders
-	    sql = "INSERT INTO orders " +
-		"VALUES (?, '2005-02-02', '2005-03-02', '2005-02-010', 'In Process', 'New customer!'," +
-		"?)";
-	    preparedStmt = conn.prepareStatement(sql);
-	    preparedStmt.setInt(1, orderNum);
-	    preparedStmt.setInt(2, custNum);
-	    preparedStmt.executeUpdate();
+            // If the order of the customer is within a month of another order,
+            // merge the two orders by combining their shipping dates.
+            while (rs.next()) {
+                java.sql.Date sqlDate = rs.getDate(2);
+                sql = "SELECT * FROM order where custNum = ? AND " + 
+                    "ABS(datediff(order.shipdate, ?)) <= 30";
+                preparedStmt = conn.prepareStatement(sql);
+                preparedStmt.setInt(1, custNum);
+                preparedStmt.setDate(2, sqlDate);
 
-	    // Create orderlines
-	    sql = "INSERT INTO orderdetails " +
-		"VALUES (?, ?, 5, 0, 20400)";
-	    preparedStmt = conn.prepareStatement(sql);
-	    preparedStmt.setInt(1, orderNum);
-	    preparedStmt.setString(2, productCode);
-	    preparedStmt.executeUpdate();
+                ResultSet rs2 = preparedStmt.executeQuery();
 
-	    // Find all the orders of the customer
-	    sql = "SELECT * FROM orders where customerNumber = " + custNum;
-	    rs = stmt.executeQuery(sql); 
+                if (rs2.next()) {  
+                    java.sql.Date sqlDate2 = rs2.getDate(2);
 
-	    // If the order of the customer is within a month of another order,
-	    // merge the two orders by combining their shipping dates.
-	    while (rs.next()) {
-		sqlDate = rs.getDate(2);
-		sql = "SELECT * FROM orders where customerNumber = ? AND " + 
-		    "ABS(datediff(orders.orderDate, ?)) <= 30";
-		preparedStmt = conn.prepareStatement(sql);
-		preparedStmt.setInt(1, custNum);
-		preparedStmt.setDate(2, sqlDate);
+                    sql = "UPDATE orders " +
+                        "SET shipDate = ? WHERE orderNum = ?";	
+                    preparedStmt = conn.prepareStatement(sql);
 
-		rs2 = preparedStmt.executeQuery();
+                    if (sqlDate2.before(sqlDate)) {
+                        preparedStmt.setDate(1, sqlDate);
+                        preparedStmt.setInt(2, rs2.getInt(1));
+                    } else {
+                        preparedStmt.setDate(1, sqlDate2);
+                        preparedStmt.setInt(2, rs.getInt(1));
+                    }
 
-		if (rs2.next()) {  
-		    sqlDate2 = rs2.getDate(2);
+                    preparedStmt.executeUpdate();
+                }
+            }	    
 
-		    sql = "UPDATE orders " +
-			"SET orderDate = ? WHERE orderNumber = ?";	
-		    preparedStmt = conn.prepareStatement(sql);
-
-		    if (sqlDate2.before(sqlDate)) {
-			preparedStmt.setDate(1, sqlDate);
-			preparedStmt.setInt(2, rs2.getInt(1));
-		    } else {
-			preparedStmt.setDate(1, sqlDate2);
-			preparedStmt.setInt(2, rs.getInt(1));
-		    }
-		  
-		    preparedStmt.executeUpdate();
-		}
-	    }	    
-
-	    conn.commit();
-	    System.out.println("Executed update");
-	} 
-	// Handle exceptions
-	catch(Exception e){
-	    System.out.println(e.getMessage());
-	    try {
-
-		if (conn != null) {
-		    conn.rollback();
-		}
-	    } catch (SQLException excep) {
-		System.out.println("Rollback failed.");
-		excep.printStackTrace();
-	    } 	    
-	} 
-	// Close resources
-	finally {
-	    try {
-		//		preparedStmt.close();
-		if (conn != null) {		 
-		    conn.close();
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
-	System.out.println("Goodbye!");
+            conn.commit();
+            System.out.println("Executed update");        
+        // Handle exceptions
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException excep) {
+                System.out.println("Rollback failed.");
+                excep.printStackTrace();
+            } 	    
+        } 
+        // Close resources
+        finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (preparedStmt != null) {
+                    preparedStmt.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null) {
+                    rs.close();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (rs2 != null) {
+                    rs2.close();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (conn != null) {		 
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Goodbye!");
     }
 }
