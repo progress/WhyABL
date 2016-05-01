@@ -1,74 +1,85 @@
 # Why ABL Example
 # Authors: Bill Wood, Alan Estrada
 # File Name: DbAndStructures/example.py
-# Version 1.02
-#
+# Version 1.04
 
 import MySQLdb as mdb
 
-# TODO: Change to primeCustomers (don't use TempTable).
-class TempTable:
-    customerNumber = 0
-    email = 0
+class PrimeCustomer:
+    id = 0
+    newRep = ""
 
 with open('input.txt', 'r') as f:
     lines = f.readlines()
 
-temptable = []
+primeCustomers = []
 
 for line in lines:
     words = line.split()
 
-    tt = TempTable()
+    tt = PrimeCustomer()
     
-    tt.customerNumber = int(words[0])
-    tt.email = words[1]
+    tt.id = int(words[0])
+    tt.newRep = words[1]
 
-    temptable.append(tt)
+    primeCustomers.append(tt)
 
 try:
-    db = mdb.connect('localhost', 'root', '', 'classicmodels')
+    db = mdb.connect('localhost', 'root', '', 'sports2000')
     cur = db.cursor()
 
-    # Case 1: Get a list of all the customers we are going to impact
+    # Get a list of all the customers we are going to impact
     # This section is analagous to the ABL code:
-    # FOR EACH tt:
-    #   FIND FIRST customers WHERE customers.customerNumber = tt.customerNumber BY tt.customerNumber.
-    #   DISPLAY tt.customerNumber customers.Name.
-    # END.
+	# FOR EACH primeCustomer, FIRST Customer WHERE Customer.CustNum = primeCustomer.id BY primeCustomer.id:
+	#   DISPLAY Customer.Name primeCustomer.id.
+	# END.
     
     # Create a string to use for the SQL IN operator
     customerNumbers = '('
-    for tt in temptable:
-        customerNumbers += str(tt.customerNumber)
+    for prime in primeCustomers:
+        customerNumbers += str(prime.id)
         customerNumbers += ', '
         
     # Remove the trailing comma and space and add ending parenthesis 
     customerNumbers = customerNumbers[:-2]
     customerNumbers += ')'
 
-    cur.execute("SELECT customerNumber, customerName from customers where customerNumber in {}".format(customerNumbers))
+    cur.execute("SELECT Name, custNum from customers where custNum in {}".format(customerNumbers))
     
     row = cur.fetchone()
     while row is not None:
         print ", ".join([str(c) for c in row])
         row = cur.fetchone()
 
-    # After being given a list of customers and the emails of their new sales reps,
-    # iterate through each customer and assign them the sales rep that the email
-    # belongs to.
+	# Get a list of all the new salesReps for Massachusetts customers
+	# This is analagous to the ABL code:
+	# FOR EACH Customer WHERE Customer.State = "MA", EACH primeCustomer WHERE primeCustomer.id = Customer.CustNum:
+	#    DISPLAY Customer.Name primeCustomer.newRep.
+	# END.
+	cur.execute("SELECT Name, custNum from customers where State = 'MA'")
+    
+    row = cur.fetchone()
+    while row is not None:
+		for prime in primeCustomers:
+			if row[1] == prime.id:
+				print row[0], prime.newRep
+		
+        row = cur.fetchone()
+		
+    # Go through each customer and assign them the sales rep
+    # with the given name
     #
     # This is analagous to the ABL code:
-    # FOR EACH tt:
-    #    FIND Customers WHERE Customers.customerNumber = tt.customerNumber.
-    #    FIND employees WHERE employees.email = tt.email.
-    #    Customers.salesRepEmployeeNumber = employees.employeeNumber.
-    # END.
-    for tt in temptable:
-        cur.execute("UPDATE customers " +  \
-                    "SET salesRepEmployeeNumber = " + \
-                    "(SELECT employeeNumber FROM employees WHERE email = '{}' LIMIT 1) ".format(tt.email) + \
-                    "WHERE customerNumber = {}".format(tt.customerNumber))
+	# FOR EACH prime:
+	#    FIND Customer WHERE Customer.CustNum = primeCustomer.customerNumber.
+	#    FIND SalesRep WHERE SalesRep.RepName = primeCustomer.newRep.
+	#    Customer.SalesRep = SalesRep.SalesRep.
+	# END.
+    for prime in primeCustomers:
+        cur.execute("UPDATE customer " +  \
+                    "SET salesRep = " + \
+                    "(SELECT salesRep FROM SalesRep WHERE repName = '{}' LIMIT 1) ".format(prime.newRep) + \
+                    "WHERE customerNumber = {}".format(prime.id))
 
     db.commit()
 except Exception as e:

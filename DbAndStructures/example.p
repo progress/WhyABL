@@ -1,11 +1,15 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
    File Name: DbAndStructures/example.p
-   Version 1.02
+   Version 1.04
+   
+   This example is to show the simplicity of being able to use temp-tables
+   and be able to query temp-tables as if they were actual tables in the
+   database. This is useful if you want to do joins from data that you
+   read from a file and not necessariy want to put in a database table.
 */
 
-// TODO: Change to primeCustomer
-DEFINE temp-table primes
+DEFINE temp-table primeCustomer
    FIELD id like customer.CustNum
    FIELD newRep like salesRep.RepName.
 END.
@@ -13,19 +17,19 @@ END.
 // Read in the numbers from a file
 
 /* Case 1: Get a list of all the Customers we are going to impact. */
-FOR EACH prime, FIRST Customer WHERE Customer.CustNum = prime.id BY prime.id:
-   DISPLAY prime.customerNumber Customer.Name.
+FOR EACH primeCustomer, FIRST Customer WHERE Customer.CustNum = primeCustomer.id BY primeCustomer.id:
+   DISPLAY Customer.Name primeCustomer.id.
 END.
 
 /* Case 2: Get a list of all the new SalesReps for Massachusetts customers */
-FOR EACH Customer WHERE Customer.State = "MA", EACH prime WHERE prime.id = Customer.CustNum:
-   DISPLAY Customer.Name prime.newRep.
+FOR EACH Customer WHERE Customer.State = "MA", EACH primeCustomer WHERE primeCustomer.id = Customer.CustNum:
+   DISPLAY Customer.Name primeCustomer.newRep.
 END.
 
 /* Case 3: Go through each customer and assign them the sales rep
    with the given name. */
 FOR EACH prime:
-   FIND Customer WHERE Customer.CustNum = prime.customerNumber.
-   FIND SalesRep WHERE SalesRep.RepName = prime.newRep.
+   FIND Customer WHERE Customer.CustNum = primeCustomer.customerNumber.
+   FIND SalesRep WHERE SalesRep.RepName = primeCustomer.newRep.
    Customer.SalesRep = SalesRep.SalesRep.
 END.
