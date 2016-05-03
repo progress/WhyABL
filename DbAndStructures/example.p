@@ -10,11 +10,23 @@
 */
 
 DEFINE temp-table primeCustomer
-   FIELD id like customer.CustNum
-   FIELD newRep like salesRep.RepName.
-END.
+   FIELD id LIKE customer.CustNum
+   FIELD newRep LIKE salesrep.repname.
 
-// Read in the numbers from a file
+DEFINE VARIABLE i1 as INTEGER.
+DEFINE VARIABLE c1 as CHARACTER.
+
+// Read in information from a file
+INPUT FROM "input.txt".
+
+REPEAT :
+    IMPORT  i1 c1.
+    CREATE primeCustomer.
+    
+    primeCustomer.id = i1.
+    primeCustomer.newRep = c1.
+
+END.
 
 /* Case 1: Get a list of all the Customers we are going to impact. */
 FOR EACH primeCustomer, FIRST Customer WHERE Customer.CustNum = primeCustomer.id BY primeCustomer.id:
@@ -28,8 +40,8 @@ END.
 
 /* Case 3: Go through each customer and assign them the sales rep
    with the given name. */
-FOR EACH prime:
-   FIND Customer WHERE Customer.CustNum = primeCustomer.customerNumber.
+FOR EACH primeCustomer:
+   FIND Customer WHERE Customer.CustNum = primeCustomer.id.
    FIND SalesRep WHERE SalesRep.RepName = primeCustomer.newRep.
    Customer.SalesRep = SalesRep.SalesRep.
 END.
