@@ -1,3 +1,5 @@
-Currently using mySQL database for C#, Python and Java.
+These are examples highlighting some differences between ABL and other languages such as C#, Python, and Java when they query a database. We're using a mySQL database that is a mirror of the sports2000 database (which will be uploaded in June).
 
-The sample database classicmodels can be found here: http://www.mysqltutorial.org/mysql-sample-database.aspx. We're using this one because it closely mirrors a Customer table in the OE sports2000 database. Only work that needs to be done is to add a Balance column and update it to have some kind of value.
+Cuurrently, the Structures folder still uses a sample mySQL database called 'classicmodels', which can be found here: http://www.mysqltutorial.org/mysql-sample-database.aspx. 
+
+All of these files should be runnable with minimal effort. For any questions, email aestrada @ progress dot com.
