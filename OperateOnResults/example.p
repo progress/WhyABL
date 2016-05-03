@@ -1,7 +1,7 @@
 /* Why ABL Example
    Authors: Bill Wood, Alan Estrada
    File Name: OperateOnResults/abl_example.p
-   Version 1.02
+   Version 1.04
  
    This .p shows how you can interact with the database as if it were native 
    to the language without copying data around.
