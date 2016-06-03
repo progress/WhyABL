@@ -51,12 +51,12 @@ try:
         print ", ".join([str(c) for c in row])
         row = cur.fetchone()
 
-	# Get a list of all the new salesReps for Massachusetts customers
-	# This is analagous to the ABL code:
-	# FOR EACH Customer WHERE Customer.State = "MA", EACH primeCustomer WHERE primeCustomer.id = Customer.CustNum:
-	#    DISPLAY Customer.Name primeCustomer.newRep.
-	# END.
-	cur.execute("SELECT Name, custNum from customers where State = 'MA'")
+    # Get a list of all the new salesReps for Massachusetts customers
+    # This is analagous to the ABL code:
+    # FOR EACH Customer WHERE Customer.State = "MA", EACH primeCustomer WHERE primeCustomer.id = Customer.CustNum:
+    #    DISPLAY Customer.Name primeCustomer.newRep.
+    # END.
+    cur.execute("SELECT Name, custNum from customers where State = 'MA'")
     
     row = cur.fetchone()
     while row is not None:
@@ -70,11 +70,11 @@ try:
     # with the given name
     #
     # This is analagous to the ABL code:
-	# FOR EACH prime:
-	#    FIND Customer WHERE Customer.CustNum = primeCustomer.customerNumber.
-	#    FIND SalesRep WHERE SalesRep.RepName = primeCustomer.newRep.
-	#    Customer.SalesRep = SalesRep.SalesRep.
-	# END.
+    # FOR EACH prime:
+    #    FIND Customer WHERE Customer.CustNum = primeCustomer.customerNumber.
+    #    FIND SalesRep WHERE SalesRep.RepName = primeCustomer.newRep.
+    #    Customer.SalesRep = SalesRep.SalesRep.
+    # END.
     for prime in primeCustomers:
         cur.execute("UPDATE customer " +  \
                     "SET salesRep = " + \
