@@ -60,9 +60,9 @@ try:
     
     row = cur.fetchone()
     while row is not None:
-		for prime in primeCustomers:
-			if row[1] == prime.id:
-				print row[0], prime.newRep
+	for prime in primeCustomers:
+		if row[1] == prime.id:
+			print row[0], prime.newRep
 		
         row = cur.fetchone()
 		
