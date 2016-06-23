@@ -30,9 +30,9 @@ try:
 
     # Get a list of all the customers we are going to impact
     # This section is analagous to the ABL code:
-	# FOR EACH primeCustomer, FIRST Customer WHERE Customer.CustNum = primeCustomer.id BY primeCustomer.id:
-	#   DISPLAY Customer.Name primeCustomer.id.
-	# END.
+    # FOR EACH primeCustomer, FIRST Customer WHERE Customer.CustNum = primeCustomer.id BY primeCustomer.id:
+    #   DISPLAY Customer.Name primeCustomer.id.
+    # END.
     
     # Create a string to use for the SQL IN operator
     customerNumbers = '('
